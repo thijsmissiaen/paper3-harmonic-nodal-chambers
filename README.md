@@ -1,8 +1,8 @@
 # Harmonic Nodal Geometry, Zero-Curve Curvature, and the Transverse Integral Identity for Riemann's $\Xi$-Function
 
-**DOI (Zenodo / CERN):** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23641701.svg)](https://doi.org/10.5281/zenodo.23641701) [`10.5281/zenodo.23641701`](https://doi.org/10.5281/zenodo.23641701)  
+**DOI (Zenodo / CERN):** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23641700.svg)](https://doi.org/10.5281/zenodo.23641700) [`10.5281/zenodo.23641700`](https://doi.org/10.5281/zenodo.23641700)  
 **Author:** Thijs Missiaen (Independent Researcher, Belgium; ORCID: [0009-0007-3678-0810](https://orcid.org/0009-0007-3678-0810))  
-**Repository & Version:** [`https://github.com/thijsmissiaen/paper3-harmonic-nodal-chambers`](https://github.com/thijsmissiaen/paper3-harmonic-nodal-chambers) (v1.1.0)  
+**Repository & Version:** [`https://github.com/thijsmissiaen/paper3-harmonic-nodal-chambers`](https://github.com/thijsmissiaen/paper3-harmonic-nodal-chambers) (v3.1.0)  
 **Manuscript:** [`paper/paper3_harmonic_nodal_chambers.pdf`](paper/paper3_harmonic_nodal_chambers.pdf) (15 pages, AMS-LaTeX / pdfTeX)  
 **MSC 2020:** Primary 11M06, 30C15; Secondary 30D15, 31A05, 65G30  
 **License:** MIT
