@@ -7,7 +7,7 @@ description: Analytical and geometric reference skill for Riemann's Xi-function 
 
 This skill summarizes the exact harmonic identities, conditional monotonicity statements, explicit counterexample obstructions, and verification procedures established in:
 
-> **Thijs Missiaen** (ORCID: `0009-0007-3678-0810`), *Harmonic Nodal Geometry, Zero-Curve Curvature, and the Transverse Integral Identity for Riemann's Xi-Function* (2026), 15 pages, DOI: `10.5281/zenodo.23641701`.
+> **Thijs Missiaen** (ORCID: `0009-0007-3678-0810`), *Harmonic Nodal Geometry, Zero-Curve Curvature, and the Transverse Integral Identity for Riemann's Xi-Function* (2026), 15 pages, DOI: `10.5281/zenodo.23641700`.
 
 ## 1. Universal Harmonic Structure and Euler–Stirling Boundary in $\sigma > 1$
 
