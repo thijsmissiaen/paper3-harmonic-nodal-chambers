@@ -1,69 +1,50 @@
 ---
 name: harmonic-nodal-chambers-xi
-description: Analytical and topological skill for Riemann's Xi-function covering the harmonic nodal chamber partition Omega_k of the critical strip, the Cauchy-Riemann arc-length monotonicity theorem along imaginary nodal walls Gamma_k, the exact parabolic zero-curve curvature formula kappa(gamma_k) = Xi''(gamma_k)/Xi'(gamma_k), and the Transverse Integral Law with its pure-square hyperbolic low-pass filter F_int(2dy) = tanh(dy)/(dy) and Rolle's theorem reversal.
+description: Analytical and geometric reference skill for Riemann's Xi-function covering universal harmonic nodal identities, the two-mechanism dichotomy for off-critical zeros, the Csordas-Smith-Varga zero-curve curvature jet kappa(gamma_k) = Xi''(gamma_k)/Xi'(gamma_k), and the canonical Transverse Integral Identity with its hyperbolic filter ratio F_int(2dy) = tanh(dy)/(dy).
 ---
 
-# Harmonic Nodal Chambers, Parabolic Zero-Curve Curvature, and the Transverse Integral Law for Riemann's Xi-Function
+# Harmonic Nodal Geometry, Zero-Curve Curvature, and the Transverse Integral Identity for Riemann's $\Xi$-Function
 
-This skill encapsulates the mathematical theorems, harmonic nodal chamber topology, parabolic curvature formulas, and computational verification procedures established in:
+This skill summarizes the exact harmonic identities, conditional monotonicity statements, explicit counterexample obstructions, and verification procedures established in:
 
-> **Thijs Missiaen** (ORCID: `0009-0007-3678-0810`), *Harmonic Nodal Chambers, Parabolic Zero-Curve Curvature, and the Transverse Integral Law for Riemann's ?-Function* (2026), 16 pages.
+> **Thijs Missiaen** (ORCID: `0009-0007-3678-0810`), *Harmonic Nodal Geometry, Zero-Curve Curvature, and the Transverse Integral Identity for Riemann's Xi-Function* (2026), 15 pages, DOI: `10.5281/zenodo.23641701`.
 
-## 1. Harmonic Potential Decomposition and Critical-Line Boundary Conditions
+## 1. Universal Harmonic Structure and Euler–Stirling Boundary in $\sigma > 1$
 
-Writing $s = \frac{1}{2} + d + \mathrm{i}t$ with transverse offset $d = \sigma - \frac{1}{2} \in \mathbb{R}$ and spectral height $t \in \mathbb{R}$, set $z = -\mathrm{i}(s - \frac{1}{2}) = t - \mathrm{i}d$. Riemann's completed entire function $\Xi(t - \mathrm{i}d) := \xi(\frac{1}{2} + d + \mathrm{i}t) = R(d,t) + \mathrm{i}I(d,t)$ satisfies the Cauchy—Riemann system and two-dimensional Laplace equation everywhere on $\mathbb{R}^2$:
+For any non-constant entire function $f(z)$ real on $\mathbb{R}$, write $z = t - \mathrm{i}d$ ($s = \frac{1}{2} + d + \mathrm{i}t$) and $f(t - \mathrm{i}d) = R_f(d,t) + \mathrm{i}I_f(d,t)$. Everywhere on $\mathbb{R}^2$:
 
-$$\frac{\partial R}{\partial d} = \frac{\partial I}{\partial t}, \qquad \frac{\partial I}{\partial d} = -\frac{\partial R}{\partial t}, \qquad \Delta R = \frac{\partial^2 R}{\partial d^2} + \frac{\partial^2 R}{\partial t^2} = 0, \qquad \Delta I = \frac{\partial^2 I}{\partial d^2} + \frac{\partial^2 I}{\partial t^2} = 0.$$
+$$\frac{\partial R_f}{\partial d} = \frac{\partial I_f}{\partial t}, \qquad \frac{\partial I_f}{\partial d} = -\frac{\partial R_f}{\partial t}, \qquad \Delta R_f = \frac{\partial^2 R_f}{\partial d^2} + \frac{\partial^2 R_f}{\partial t^2} = 0, \qquad \Delta I_f = \frac{\partial^2 I_f}{\partial d^2} + \frac{\partial^2 I_f}{\partial t^2} = 0.$$
 
-On the critical line $d = 0$, Schwarz reflection symmetry $\Xi(t + \mathrm{i}d) = \overline{\Xi(t - \mathrm{i}d)}$ enforces:
+1. **Critical-line boundary conditions:** $I_f(0,t) \equiv 0$, $\partial_d R_f(0,t) \equiv 0$, and $\int _ {t_1}^{t_2} R_f(0,t) \partial_d R_f(0,t) \mathrm{d}t \equiv 0$.
+2. **Orthogonal departure of imaginary nodal curves:** Because $\widetilde{I}_f(d,t) := I_f(d,t)/d = -f'(t) + \frac{1}{6}f'''(t)d^2 - \frac{1}{120}f^{(5)}(t)d^4 + \mathcal{O}(d^6)$, transverse curves $\Gamma \subset \lbrace I_f(d,t) = 0, d > 0\rbrace$ meet $d = 0$ exclusively at real critical points $f'(\tau) = 0$, with vertex curvature $\kappa _ \Gamma(\tau) = t _ \Gamma''(0) = \frac{f'''(\tau)}{3 f''(\tau)}$ whenever $f''(\tau) \neq 0$. For Riemann's $\Xi(t)$, the first two positive critical-line extrema are $\tau_1 \approx 15.58570859$ and $\tau_2 \approx 22.09797728$.
+3. **Exclusion of compact loops and Euler–Stirling boundary in $\sigma > 1$:** By $\Delta I_f = 0$, no branch of $I_f = 0$ encloses a bounded domain. For $f = \Xi$ in the Euler-product half-plane $d > \frac{1}{2}$ ($\sigma = \frac{1}{2} + d > 1$, outside the critical strip), $\frac{W(d,t)}{\lvert\Xi(t-\mathrm{i}d)\rvert^2} = \partial_t\arg\Xi(t-\mathrm{i}d) \ge \mathcal{A}(d,t) + \frac{\zeta'(1/2+d)}{\zeta(1/2+d)} > 0$ holds unconditionally for all $d > d _ {\mathrm{Euler}}(t) > \frac{1}{2}$, where $d _ {\mathrm{Euler}}(t) = \frac{1}{2} + [\frac{1}{2}\ln\frac{t}{2\pi} + \gamma _ {\mathrm{E}} + \mathcal{O}((\ln t)^{-1})]^{-1} \to \frac{1}{2}^+$.
 
-1. **Homogeneous Dirichlet nodal wall for $I$:** $I(0,t) \equiv 0$ for all $t \in \mathbb{R}$.
-2. **Homogeneous Neumann mirror wall for $R$:** $\partial_d R(0,t) \equiv 0$ for all $t \in \mathbb{R}$, and zero transverse Green boundary flux $\int _ {t_1}^{t_2} R(0,t) \partial_d R(0,t) \mathrm{d}t \equiv 0$.
-3. **Orthogonal departure of imaginary nodal walls $\Gamma_k$ from extrema $\tau_k$:** Because the parity-reduced imaginary field $\widetilde{I}(d,t) := I(d,t)/d$ has the Maclaurin expansion
+## 2. Cauchy–Riemann Arc-Length Equation, Two-Mechanism Dichotomy, and Zero-Curve Curvature
 
-$$\widetilde{I}(d,t) = \sum _ {m=0}^\infty \frac{(-1)^{m+1}}{(2m+1)!} \Xi^{(2m+1)}(t) d^{2m} = -\Xi'(t) + \frac{1}{6}\Xi'''(t) d^2 - \frac{1}{120}\Xi^{(5)}(t) d^4 + \mathcal{O}(d^6),$$
+Along any smooth segment of $\Gamma \subset \lbrace I_f = 0, d > 0\rbrace$ parameterized by arc length $s > 0$ departing from $(0,\tau)$ ($f(\tau) \neq 0$, $f''(\tau) \neq 0$) and free of critical points $f'(z) = 0$ and zeros $R_f = 0$:
 
-transverse nodal walls $\Gamma_k := \lbrace (d, t _ {\Gamma_k}(d)) : I(d,t) = 0,  d > 0\rbrace$ bifurcate orthogonally from $d = 0$ precisely at the critical-line extrema $\Xi'(\tau_k) = 0$, with vertex curvature
+$$\frac{\mathrm{d}}{\mathrm{d}s}\lvert R_f(d(s), t(s))\rvert = \mathrm{sgn}\big(L_1(f;\tau)\big)\,\lvert\nabla I_f(d(s), t(s))\rvert = \mathrm{sgn}\big(L_1(f;\tau)\big)\,\lvert f'(t(s) - \mathrm{i}d(s))\rvert,$$
 
-$$t _ {\Gamma_k}'(0) = 0, \qquad \kappa _ \Gamma(\tau_k) := t _ {\Gamma_k}''(0) = \frac{\Xi'''(\tau_k)}{3 \Xi''(\tau_k)}.$$
+where $L_1(f;\tau) = -f(\tau)f''(\tau)$ is the classical first Laguerre expression (Jensen, 1913; Csordas–Varga, 1990). Consequently, an off-critical zero $(d _ {\star}, t _ {\star})$ ($d _ {\star} > 0$) on $\Gamma$ requires **either** (i) a boundary Laguerre violation $L_1(f;\tau) \le 0$ on $d = 0$ (realized by $\Xi _ {\mathrm{hyp}}(z; 0.25)$ at $\tau _ {\star} \approx 17.87156653$) **or** (ii) an interior critical point $f'(z _ {\mathrm{crit}}) = 0$ in $d > 0$ (realized by $\Xi _ {\mathrm{hyp}}(z; 1.30)$ at $(d _ {\mathrm{crit}}, t _ {\mathrm{crit}}) \approx (0.56054034, 18.66151713){}$). Ruling out interior critical points of $\Xi$ in $d > 0$ is equivalent to RH (Lagarias, 1999; distinct from Speiser's theorem $\zeta'(s) \neq 0$ in $0 < \sigma < \frac{1}{2}$).
 
-4. **Exclusion of compact nodal loops and deductive Euler—Stirling right boundary:** By the harmonic maximum principle ($\Delta I = 0$), no nodal branch of $I(d,t) = 0$ can form a closed loop in $d \ge 0$, so $I(d,t)$ maintains constant strict sign $\mathrm{sgn} I(d,t) = (-1)^{k-1}$ inside each harmonic nodal chamber $\Omega_k$ bounded by $\Gamma _ {k-1}$, $\Gamma_k$, and $d = 0$. Furthermore, for $d > d _ {\mathrm{Euler}}(t) > \frac{1}{2}$ where the Archimedean drift $\mathcal{A}(d,t) = \mathrm{Re}(\frac{1}{s} + \frac{1}{s-1} - \frac{1}{2}\ln\pi + \frac{1}{2}\psi(\frac{s}{2}))$ exceeds the Euler—Dirichlet majorant $M _ {\mathrm{Euler}}(d) = -\frac{\zeta'(1/2+d)}{\zeta(1/2+d)} > 0$, one has unconditionally:
+Around any simple real zero $\gamma_k$, the real nodal curve $\mathcal{R} _ k := \lbrace (d, t _ {\mathcal{R} _ k}(d)) : R_f(d,t) = 0\rbrace$ satisfies
 
-$$\frac{W(d,t)}{\lvert\Xi(t - \mathrm{i}d)\rvert^2} = \frac{\partial}{\partial t}\arg\Xi(t - \mathrm{i}d) \ge \mathcal{A}(d,t) + \frac{\zeta'(\frac{1}{2}+d)}{\zeta(\frac{1}{2}+d)} > 0, \qquad d _ {\mathrm{Euler}}(t) = \frac{1}{2} + \frac{1}{\frac{1}{2}\ln\frac{t}{2\pi} + \gamma _ {\mathrm{E}} + \mathcal{O}((\ln t)^{-1})} \to \frac{1}{2}^+.$$
+$$t _ {\mathcal{R} _ k}(d) - \gamma_k = c _ {\mathrm{par}}(\gamma_k) d^2 + c _ {\mathrm{quart}}(\gamma_k) d^4 + \mathcal{O}(d^6), \qquad \kappa(\gamma_k) := t _ {\mathcal{R} _ k}''(0) = \frac{f''(\gamma_k)}{f'(\gamma_k)}, \qquad c _ {\mathrm{par}}(\gamma_k) = \frac{1}{2}\kappa(\gamma_k),$$
 
-## 2. Cauchy—Riemann Arc-Length Monotonicity and Parabolic Zero-Curve Curvature
+matching for $f = \Xi$ the de Bruijn–Newman zero-velocity ratio of Csordas, Smith, and Varga (1994).
 
-Along any smooth imaginary nodal wall $\Gamma_k = \lbrace (d(s), t(s)) : s \ge 0\rbrace$ parameterized by arc length $s$ moving into $d > 0$ from $(0, \tau_k)$, the Cauchy—Riemann equations imply $\nabla R \perp \nabla I$ and $\lvert\nabla R\rvert = \lvert\nabla I\rvert = \lvert\Xi'(t - \mathrm{i}d)\rvert$. Because $\nabla I$ is normal to $\Gamma_k$, $\nabla R$ is purely tangent to $\Gamma_k$, and the initial concavity $c_1(\tau_k) = -\Xi(\tau_k)\Xi''(\tau_k) > 0$ fixes the positive sign:
+## 3. Canonical Transverse Wronskian, Integral Identity, and Obstructions
 
-$$\frac{\mathrm{d}}{\mathrm{d}s}\lvert R(d(s), t(s))\rvert = +\lvert\nabla I(d(s), t(s))\rvert = \lvert\Xi'(t(s) - \mathrm{i}d(s))\rvert > 0,$$
+Under canonical normalization $W(d,t) = \frac{1}{2}\partial_d\lvert\Xi(t-\mathrm{i}d)\rvert^2 = 16\int_0^\infty y\sinh(2d y)\,I _ {\mathrm{Wig}}(y,t)\,\mathrm{d}y$ and $\widetilde{W}(d,t) = W(d,t)/d = 32\int_0^\infty y^2\,\mathrm{sinc} _ {\mathrm{hyp}}(2d y)\,I _ {\mathrm{Wig}}(y,t)\,\mathrm{d}y$ with $I _ {\mathrm{Wig}}(y,t) = \int _ {-\infty}^\infty \Phi(\frac{x+y}{2})\Phi(\frac{x-y}{2})\cos(2t x)\,\mathrm{d}x$:
 
-so $\lvert R\rvert$ grows strictly away from $\lvert\Xi(\tau_k)\rvert > 0$ along $\Gamma_k$ whenever $\Gamma_k$ is free of critical points $\Xi'(z) = 0$ (giving a direct geometric formulation of Speiser's theorem).
+$$\lvert\Xi(t - \mathrm{i}d)\rvert^2 = \lvert\Xi(t)\rvert^2 + 2\int_0^d u \widetilde{W}(u,t) \mathrm{d}u, \qquad \frac{2}{d^2}\int_0^d u \widetilde{W}(u,t) \mathrm{d}u = 32\int_0^\infty y^2\,\mathrm{sinc} _ {\mathrm{hyp}}^2(d y)\,I _ {\mathrm{Wig}}(y,t)\,\mathrm{d}y,$$
 
-Around each simple real zero $\gamma_k$ ($\Xi(\gamma_k) = 0$, $\Xi'(\gamma_k) \neq 0$), the real zero curve $\mathcal{R} _ k := \lbrace (d, t _ {\mathcal{R} _ k}(d)) : R(d,t) = 0\rbrace$ departs orthogonally from $d = 0$ with exact parabolic curvature $\kappa(\gamma_k) := t _ {\mathcal{R} _ k}''(0)$ and quartic Taylor expansion:
-
-$$t _ {\mathcal{R} _ k}(d) - \gamma_k = c _ {\mathrm{par}}(\gamma_k) d^2 + c _ {\mathrm{quart}}(\gamma_k) d^4 + \mathcal{O}(d^6), \qquad \kappa(\gamma_k) = \frac{\Xi''(\gamma_k)}{\Xi'(\gamma_k)}, \qquad c _ {\mathrm{par}}(\gamma_k) = \frac{1}{2}\kappa(\gamma_k) = \frac{\Xi''(\gamma_k)}{2 \Xi'(\gamma_k)},$$
-
-where
-
-$$c _ {\mathrm{quart}}(\gamma_k) = \frac{12 \Xi'''(\gamma_k) c _ {\mathrm{par}}(\gamma_k) - 12 \Xi''(\gamma_k) c _ {\mathrm{par}}(\gamma_k)^2 - \Xi^{(4)}(\gamma_k)}{24 \Xi'(\gamma_k)}, \qquad \kappa(\gamma_k) = -\mathrm{Im}\left(2 g_1\left(\frac{1}{2}+\mathrm{i}\gamma_k\right) + \frac{\zeta''(\frac{1}{2}+\mathrm{i}\gamma_k)}{\zeta'(\frac{1}{2}+\mathrm{i}\gamma_k)}\right).$$
-
-## 3. Transverse Integral Law, Rolle Reversal, and Hyperbolic Low-Pass Filter
-
-Integrating $\partial_u\lvert\Xi(t - \mathrm{i}u)\rvert^2 = 2u \widetilde{W}(u,t)$ over $u \in [0,d]$ yields the Transverse Integral Law and complementary pure-square decomposition:
-
-$$\lvert\Xi(t - \mathrm{i}d)\rvert^2 = \lvert\Xi(t)\rvert^2 + 2\int_0^d u \widetilde{W}(u,t) \mathrm{d}u = \Big[\Xi(t)^2 + d^2\big(\Xi'(t)\big)^2\Big] - d^2\Xi(t)\Xi''(t) + 2\int_0^d u\big(\widetilde{W}(u,t) - \widetilde{W}(0,t)\big) \mathrm{d}u.$$
-
-1. **Rolle's Theorem Reversal:** Any hypothetical off-critical zero $(d _ {\star}, t _ {\star})$ with $d _ {\star} > 0$ and $\widetilde{W}(0, t _ {\star}) > 0$ forces an interior turning point $d _ {\mathrm{peak}} \in (0, d _ {\star})$ where $\widetilde{W}(d _ {\mathrm{peak}}, t _ {\star}) = 0$, $\partial_d\widetilde{W}(d _ {\mathrm{peak}}, t _ {\star}) \le 0$, and $\int _ {d _ {\mathrm{peak}}}^{d _ {\star}} 2u \widetilde{W}(u, t _ {\star}) \mathrm{d}u = -\lvert\Xi(t _ {\star} - \mathrm{i}d _ {\mathrm{peak}})\rvert^2 < 0$.
-2. **Pure-Square Wigner Kernel and Hyperbolic Low-Pass Filter:** The normalized integral operator $\frac{2}{d^2}\int_0^d u (\cdot) \mathrm{d}u$ transforms the parity-reduced Wronskian kernel $\mathrm{sinc} _ {\mathrm{hyp}}(2u y) = \frac{\sinh(2u y)}{2u y}$ into the pure square $\mathrm{sinc} _ {\mathrm{hyp}}^2(d y) = (\frac{\sinh(d y)}{d y})^2 > 0$, multiplying every mode $y > 0$ by the strictly contractive hyperbolic low-pass filter:
-
-$$\mathcal{F} _ {\mathrm{int}}(2d y) := \frac{\mathrm{sinc} _ {\mathrm{hyp}}^2(d y)}{\mathrm{sinc} _ {\mathrm{hyp}}(2d y)} = \frac{\tanh(d y)}{d y} \in (0, 1) \qquad (\forall  d y > 0).$$
+with filter ratio $\mathcal{F} _ {\mathrm{int}}(2d y) = \frac{\mathrm{sinc} _ {\mathrm{hyp}}^2(d y)}{\mathrm{sinc} _ {\mathrm{hyp}}(2d y)} = \frac{\tanh(d y)}{d y} \in (0, 1)$ for $d y > 0$. Because $I _ {\mathrm{Wig}}(y,t)$ oscillates in sign and universal harmonic laws also hold for Davenport–Heilbronn functions, neither nodal geometry nor the $\mathrm{sinc} _ {\mathrm{hyp}}^2$ kernel yields unconditional global positivity without arithmetic Euler-product input inside $0 < d < \frac{1}{2}$ (where Voronin universality rules out triangle-inequality majorants).
 
 ## 4. Verification Procedure
-
-Run the standalone verification script from the repository root:
 
 ```bash
 python scripts/verify_paper3_harmonic_nodal_chambers.py
 ```
 
-The script verifies all harmonic boundary conditions, the parabolic curvature table across $\gamma_1, \dots, \gamma _ {15}$, the topological tracking of $\Omega_1, \dots, \Omega _ {25}$ to $d _ {\mathrm{Euler}}(t)$, the Transverse Integral Law, Rolle reversal, and the $60{,}000$-point continuum scan across $t \in [14, 1000]$, and regenerates the publication figures in `paper/figures/`.
+Reproduces all 50-digit local jets, rigorous `mpmath.iv` curvature sign enclosures across $\gamma_1, \dots, \gamma _ {15}$, tracking across $\Omega_1, \dots, \Omega _ {25}$, both off-critical dichotomy models, and the 300-DPI figures in `paper/figures/`.

@@ -4,13 +4,13 @@
 verify_paper3_harmonic_nodal_chambers.py
 ===============================================================================
 Standalone Verification & Figure Generation Suite for Paper III:
-"Harmonic Nodal Chambers, Parabolic Zero-Curve Curvature, and the Transverse
-Integral Law for Riemann's Xi-Function"
+"Harmonic Nodal Geometry, Zero-Curve Curvature, and the Transverse
+Integral Identity for Riemann's Xi-Function"
 
 Author : Thijs Missiaen (Independent Researcher, Belgium)
 ORCID  : https://orcid.org/0009-0007-3678-0810
 Email  : thijs.missiaen@gmail.com
-Series : Transverse Wronskian of Riemann's Xi-Function (Paper III of IX)
+Series : Analytic and Geometric Properties of the Transverse Wronskian of Riemann's Xi-Function (Paper III)
 
 This self-contained script executes a four-tier verification protocol:
   1. Tier 1 (Harmonic Boundary Conditions & Parabolic Curvature kappa(gamma_k)):
@@ -70,7 +70,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 mp.mp.dps = 50
-mp.iv.dps = 40
+mp.iv.dps = 55
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PUB_ROOT = SCRIPT_DIR.parent
@@ -377,32 +377,36 @@ def verify_tier1_curvature():
     print(hdr)
     print("  " + "-" * (len(hdr) - 2))
 
-    # Precompute 12-panel 32-point Gauss-Legendre nodes, weights, and Jacobi-Riemann kernel in mpmath.iv
-    # on w = 2u in [0, U_max = 3.0] for genuine directed-rounding interval quadrature of Xi^{(m)}(t)
-    w_nodes_iv, w_weights_iv, phi_w_iv = [], [], []
+    # Precompute composite trapezoidal nodes and weights on u in [0, U_max = 1.55] (N_u = 160)
+    # in mpmath.iv with rigorous Trefethen-Weideman strip error < 1e-65 on t <= 66 (Paper II, Lemma A.1(c)):
+    # 2*pi*eta/h = 2*pi*(0.35)*(160)/1.55 = 227.005 => exp(-227.0) * exp(2*66*0.35) * 2*M(0.35) < 1e-65.
     pi_iv = mp.iv.pi
-    n_panels_iv = 12
-    u_max_iv = mp.mpf("3.0")
-    for p_idx in range(n_panels_iv):
-        a_p = mp.mpf(p_idx) * (u_max_iv / n_panels_iv)
-        b_p = mp.mpf(p_idx + 1) * (u_max_iv / n_panels_iv)
-        half_p = mp.iv.mpf(mp.mpf("0.5") * (b_p - a_p))
-        mid_p = mp.iv.mpf(mp.mpf("0.5") * (b_p + a_p))
-        for x_i, wt_i in zip(GL32_NODES, GL32_WEIGHTS):
-            w_iv = mid_p + half_p * mp.iv.mpf([x_i - mp.mpf("1e-48"), x_i + mp.mpf("1e-48")])
-            wt_full_iv = half_p * mp.iv.mpf([wt_i - mp.mpf("1e-48"), wt_i + mp.mpf("1e-48")])
-            s_phi = mp.iv.mpf("0")
-            e2w = mp.iv.exp(2 * w_iv)
-            e5w2 = mp.iv.exp(mp.iv.mpf("2.5") * w_iv)
-            e9w2 = mp.iv.exp(mp.iv.mpf("4.5") * w_iv)
-            for n_idx in range(1, 16):
-                n2 = mp.iv.mpf(n_idx * n_idx)
-                n4 = n2 * n2
-                term = (2 * (pi_iv**2) * n4 * e9w2 - 3 * pi_iv * n2 * e5w2) * mp.iv.exp(-pi_iv * n2 * e2w)
-                s_phi += 2 * term
-            w_nodes_iv.append(w_iv)
-            w_weights_iv.append(wt_full_iv)
-            phi_w_iv.append(s_phi)
+    n_u_iv = 160
+    u_max_iv = mp.iv.mpf("1.55")
+    h_u_iv = u_max_iv / mp.iv.mpf(n_u_iv)
+    u2_nodes_iv, phi_wt_iv = [], []
+    eps_ser_iv = mp.iv.mpf(["0", "1e-220"])
+    for j_u in range(n_u_iv + 1):
+        u_iv = mp.iv.mpf(j_u) * h_u_iv
+        e4u = mp.iv.exp(4 * u_iv)
+        e5u = mp.iv.exp(5 * u_iv)
+        e9u = mp.iv.exp(9 * u_iv)
+        s_phi = mp.iv.mpf("0")
+        for n_idx in range(1, 13):
+            n2 = mp.iv.mpf(n_idx * n_idx)
+            n4 = n2 * n2
+            s_phi += (2 * (pi_iv**2) * n4 * e9u - 3 * pi_iv * n2 * e5u) * mp.iv.exp(-pi_iv * n2 * e4u)
+        s_phi += eps_ser_iv
+        w_tr = mp.iv.mpf("0.5") if (j_u == 0 or j_u == n_u_iv) else mp.iv.mpf("1.0")
+        u2_nodes_iv.append(2 * u_iv)
+        phi_wt_iv.append(8 * h_u_iv * w_tr * s_phi)
+    rem_iv = mp.iv.mpf(["-1e-65", "1e-65"])
+
+    def _iv_xi_scalar(t_iv_pt):
+        acc = mp.iv.mpf("0")
+        for u2_iv, pw_iv in zip(u2_nodes_iv, phi_wt_iv):
+            acc += pw_iv * mp.iv.cos(u2_iv * t_iv_pt)
+        return acc + rem_iv
 
     curvature_rows = []
     max_arch_zeta_err = mp.mpf("0")
@@ -442,27 +446,29 @@ def verify_tier1_curvature():
         )
         err_track_quart = abs(t_exact_05 - t_pred_quart)
 
-        # Genuine directed-rounding interval evaluation in mpmath.iv via Fourier-Laplace quadrature:
-        # Xi^{(m)}(t) = 2*(-1)^{m/2} int_0^{U_max} w^m Phi_tilde(w) cos(w*t) dw (even m)
-        #             = 2*(-1)^{(m+1)/2} int_0^{U_max} w^m Phi_tilde(w) sin(w*t) dw (odd m)
-        gk_iv = mp.iv.mpf([gk - mp.mpf("1e-35"), gk + mp.mpf("1e-35")])
-        rem_iv = mp.iv.mpf(["-1e-34", "1e-34"])
+        # Rigorous IVT root enclosure + composite trapezoidal interval derivatives in mpmath.iv:
+        rad_gk = mp.mpf("1e-22")
+        gk_lo = mp.iv.mpf(str(gk - rad_gk))
+        gk_hi = mp.iv.mpf(str(gk + rad_gk))
+        xi_lo = _iv_xi_scalar(gk_lo)
+        xi_hi = _iv_xi_scalar(gk_hi)
+        assert (xi_lo.b < 0 and xi_hi.a > 0) or (xi_lo.a > 0 and xi_hi.b < 0), f"IVT failed at gamma_{k}"
+        gk_iv = mp.iv.mpf([gk_lo.a, gk_hi.b])
         Xi1_iv = mp.iv.mpf("0")
         Xi2_iv = mp.iv.mpf("0")
         Xi3_iv = mp.iv.mpf("0")
         Xi4_iv = mp.iv.mpf("0")
-        for w_iv, wt_iv, ph_iv in zip(w_nodes_iv, w_weights_iv, phi_w_iv):
-            arg_iv = w_iv * gk_iv
+        for u2_iv, pw_iv in zip(u2_nodes_iv, phi_wt_iv):
+            arg_iv = u2_iv * gk_iv
             cos_iv = mp.iv.cos(arg_iv)
             sin_iv = mp.iv.sin(arg_iv)
-            base_iv = 2 * wt_iv * ph_iv
-            w2_iv = w_iv * w_iv
-            w3_iv = w2_iv * w_iv
-            w4_iv = w2_iv * w2_iv
-            Xi1_iv += -base_iv * w_iv * sin_iv
-            Xi2_iv += -base_iv * w2_iv * cos_iv
-            Xi3_iv += base_iv * w3_iv * sin_iv
-            Xi4_iv += base_iv * w4_iv * cos_iv
+            u2_2 = u2_iv * u2_iv
+            u2_3 = u2_2 * u2_iv
+            u2_4 = u2_2 * u2_2
+            Xi1_iv += -pw_iv * u2_iv * sin_iv
+            Xi2_iv += -pw_iv * u2_2 * cos_iv
+            Xi3_iv += pw_iv * u2_3 * sin_iv
+            Xi4_iv += pw_iv * u2_4 * cos_iv
         Xi1_iv += rem_iv
         Xi2_iv += rem_iv
         Xi3_iv += rem_iv
@@ -490,8 +496,8 @@ def verify_tier1_curvature():
         })
 
     print("  " + "-" * (len(hdr) - 2))
-    print(f"  [CERTIFIED] Max residual of Archimedean-Zeta curvature identity across gamma_1..gamma_15: {float(max_arch_zeta_err):.3e}")
-    print(f"  [CERTIFIED] Genuine mpmath.iv interval quadrature enclosure across gamma_1..gamma_15 (max width = {max_iv_width_kappa:.3e}, kappa_iv.b < 0)")
+    print(f"  [VERIFIED] Max residual of Archimedean-Zeta curvature identity across gamma_1..gamma_15: {float(max_arch_zeta_err):.3e}")
+    print(f"  [VERIFIED] Rigorous IVT + trapezoidal mpmath.iv enclosure across gamma_1..gamma_15 (max width = {max_iv_width_kappa:.3e}, kappa_iv.b < 0)")
     assert max_arch_zeta_err < mp.mpf("1e-46")
     return curvature_rows
 
@@ -678,8 +684,8 @@ def verify_tier2_chambers():
         pure_chamber_pts += same_sgn
 
     print("  " + "-" * (len(hdr_w) - 2))
-    print(f"  [CERTIFIED] Strict topological interlacing t_{{Gamma_{{k-1}}}}(d) < t_{{R_k}}(d) < t_{{Gamma_k}}(d) on d in (0, 1.65].")
-    print(f"  [CERTIFIED] Interior sign purity across Omega_1..Omega_25: {pure_chamber_pts:,d}/{total_chamber_pts:,d} points (100.0000%).")
+    print(f"  [VERIFIED] Strict topological interlacing t_{{Gamma_{{k-1}}}}(d) < t_{{R_k}}(d) < t_{{Gamma_k}}(d) on d in (0, 1.65].")
+    print(f"  [VERIFIED] Interior sign purity across Omega_1..Omega_25: {pure_chamber_pts:,d}/{total_chamber_pts:,d} grid points (100.0000%).")
 
     return {
         "gammas": gammas,
@@ -870,8 +876,32 @@ def verify_tier3_integral_law():
             f"{float(E_d_val/E0_sq):17.9f} | {float(rel_err):10.2e}"
         )
     print("  " + "-" * (len(hdr_int) - 2))
-    print(f"  [CERTIFIED] Max relative residual of boxed Transverse Integral Law: {float(max_int_err):.3e}")
+    print(f"  [VERIFIED] Max relative residual of boxed Transverse Integral Identity: {float(max_int_err):.3e}")
     assert max_int_err < mp.mpf("1e-45")
+
+    # Verify the exact two-mechanism dichotomy on Xi_hyp(z; d_0) = Xi(z)*(1 + (z - 17.85)^2 / d_0^2):
+    # (i) Near-line zero d_0 = 0.25: creates a critical-line extremum tau_* on d = 0 with L_1(Xi_hyp; tau_*) < 0
+    #     so d|R|/ds = -|grad I| < 0 decreases from |Xi_hyp(tau_*)| to 0 without an interior critical point;
+    # (ii) Deeper zero d_0 = 1.30: L_1 > 0 holds at real extrema, while two roots of Xi_hyp' collide and lift
+    #      into an interior critical point Xi_hyp'(z_crit) = 0 in d > 0 where nodal branches cross.
+    def xi_hyp_near_mp(z_c):
+        s_c = mp.mpf("0.5") + 1j * z_c
+        return xi_completed_mp(s_c) * (1 + ((z_c - mp.mpf("17.85")) / mp.mpf("0.25")) ** 2)
+
+    tau_star_near = mp.re(mp.findroot(lambda z: mp.diff(xi_hyp_near_mp, z, 1), mp.mpc("17.87", "0.0")))
+    L1_tau_star_near = mp.re(-xi_hyp_near_mp(tau_star_near) * mp.diff(xi_hyp_near_mp, tau_star_near, 2))
+    assert L1_tau_star_near < 0 and abs(mp.diff(xi_hyp_near_mp, tau_star_near, 1)) < mp.mpf("1e-40")
+    print(f"  [VERIFIED] Near-line model (d_0=0.25): boundary extremum tau_*={float(tau_star_near):.8f} violates Laguerre (L_1={float(L1_tau_star_near):.3e} < 0)")
+
+    def xi_hyp_deep_mp(z_c):
+        s_c = mp.mpf("0.5") + 1j * z_c
+        return xi_completed_mp(s_c) * (1 + ((z_c - mp.mpf("17.85")) / mp.mpf("1.30")) ** 2)
+
+    z_crit_hyp = mp.findroot(lambda z: mp.diff(xi_hyp_deep_mp, z, 1), mp.mpc("18.66", "-0.56"))
+    d_crit_hyp = -mp.im(z_crit_hyp)
+    t_crit_hyp = mp.re(z_crit_hyp)
+    assert d_crit_hyp > 0 and abs(mp.diff(xi_hyp_deep_mp, z_crit_hyp, 1)) < mp.mpf("1e-40")
+    print(f"  [VERIFIED] Deep-zero model (d_0=1.30): interior saddle Xi_hyp'(z_crit)=0 at (d_crit={float(d_crit_hyp):.8f}, t_crit={float(t_crit_hyp):.8f})")
 
     # 3B. Rolle's Theorem Reversal at a hypothetical off-critical zero (d_*, t_*) = (0.25, 14.20)
     print("\n3B. Rolle's Theorem Reversal at Hypothetical Off-Critical Zero (d_*, t_*) = (0.25, 14.20):")
@@ -1075,7 +1105,7 @@ def generate_figures(curv_rows, tier2_res, tier3_res):
 
     ax1a.set_xlim(0.0, 1.65)
     ax1a.set_ylim(12.0, 91.5)
-    ax1a.set_title(r"(a) Topological Closure of Harmonic Nodal Chambers $\Omega_1, \dots, \Omega_{25}$")
+    ax1a.set_title(r"(a) Harmonic Nodal Chambers $\Omega_1, \dots, \Omega_{25}$ & Euler–Stirling Boundary $d_{\mathrm{Euler}}(t)$")
     ax1a.set_xlabel(r"Transverse offset $d = \sigma - 1/2$")
     ax1a.set_ylabel(r"Spectral height $t$")
     ax1a.legend(loc="lower right", framealpha=0.94, fontsize=7.2)
@@ -1308,7 +1338,7 @@ def generate_figures(curv_rows, tier2_res, tier3_res):
 
     ax2c.set_xlim(14.0, 1000.0)
     ax2c.set_ylim(1e-2, 1e4)
-    ax2c.set_title(r"(c) Continuum Certification $t \in [14, 1000]$ & Low-Pass Filter $\mathcal{F}_{\mathrm{int}}(2d y) = \frac{\tanh(d y)}{d y}$")
+    ax2c.set_title(r"(c) Discrete Grid Scan on $t \in [14, 1000]$ & Low-Pass Filter $\mathcal{F}_{\mathrm{int}}(2d y) = \frac{\tanh(d y)}{d y}$")
     ax2c.set_xlabel(r"Spectral height $t \in [14, 1000]$ ($10{,}000$ grid points)")
     ax2c.set_ylabel(r"Magnitude on logarithmic scale ($d = 0.35$)")
     ax2c.legend(loc="upper left", framealpha=0.94, fontsize=7.4)
@@ -1343,8 +1373,8 @@ def generate_figures(curv_rows, tier2_res, tier3_res):
 
     ax2d.plot([], [], color="#1f77b4", lw=2.0, ls="--", label=r"Unperturbed nodal walls $I(d,t) = 0$ ($\Gamma_k$, non-intersecting)")
     ax2d.plot([], [], color="#27ae60", lw=2.0, ls="--", label=r"Unperturbed real zero curves $R(d,t) = 0$ ($\mathcal{R}_k$)")
-    ax2d.plot([], [], color="#c0392b", lw=2.2, ls="-", label=r"Perturbed $I_{\mathrm{hyp}}(d,t) = 0$ (nodal bifurcation)")
-    ax2d.plot([], [], color="#8e44ad", lw=2.2, ls="-", label=r"Perturbed $R_{\mathrm{hyp}}(d,t) = 0$ (parasitic loop)")
+    ax2d.plot([], [], color="#c0392b", lw=2.2, ls="-", label=r"Perturbed $I_{\mathrm{hyp}}(d,t) = 0$ (parasitic walls from $d=0$)")
+    ax2d.plot([], [], color="#8e44ad", lw=2.2, ls="-", label=r"Perturbed $R_{\mathrm{hyp}}(d,t) = 0$ (arch through $(d_*,t_*)$)")
 
     ax2d.scatter([14.134725, 21.022040, 25.010858], [0.0, 0.0, 0.0], color="#1a252f", s=50, zorder=7,
                  label=r"Riemann zeros $\gamma_1, \gamma_2, \gamma_3$ on $d = 0$")
@@ -1353,7 +1383,7 @@ def generate_figures(curv_rows, tier2_res, tier3_res):
 
     ax2d.set_xlim(13.2, 26.2)
     ax2d.set_ylim(0.0, 0.42)
-    ax2d.set_title(r"(d) Topological Nodal Bifurcation of $I=0$ and $R=0$ at an Off-Critical Zero")
+    ax2d.set_title(r"(d) Parasitic Nodal Walls of $I_{\mathrm{hyp}}=0$ and $R_{\mathrm{hyp}}=0$ ($d_*=0.25$, $L_1(\tau_*)<0$)")
     ax2d.set_xlabel(r"Spectral height $t$ (spanning $\gamma_1, \gamma_2, \gamma_3$)")
     ax2d.set_ylabel(r"Transverse offset $d = \sigma - 1/2$")
     ax2d.legend(loc="upper left", framealpha=0.95, fontsize=7.3)
